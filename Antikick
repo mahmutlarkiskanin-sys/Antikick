@@ -1,12 +1,13 @@
 local lp = game.Players.LocalPlayer
 local uis = game:GetService("UserInputService")
 local guiService = game:GetService("GuiService")
+local runService = game:GetService("RunService")
 
-local old = lp.PlayerGui:FindFirstChild("TURSHU_HUB_ULTIMATE")
+local old = lp.PlayerGui:FindFirstChild("HIDDEN_SHIELD_PRO")
 if old then old:Destroy() end
 
 local gui = Instance.new("ScreenGui", lp.PlayerGui)
-gui.Name = "TURSHU_HUB_ULTIMATE"
+gui.Name = "HIDDEN_SHIELD_PRO"
 gui.ResetOnSpawn = false
 
 local mt = getrawmetatable(game)
@@ -17,8 +18,6 @@ setreadonly(mt, false)
 mt.__namecall = newcclosure(function(self, ...)
     local method = getnamecallmethod()
     if tostring(method) == "Kick" or tostring(method) == "kick" then
-        warn("🛡️ TURSHU HUB: KURUCU/ADMIN KICKI ENGELLENDI!")
-        task.wait(9e9)
         return nil
     end
     return oldNamecall(self, ...)
@@ -40,17 +39,25 @@ pcall(function()
     guiService.ErrorMessageChanged:Connect(function()
         guiService:ClearError()
     end)
+    
+    runService.Stepped:Connect(function()
+        pcall(function()
+            if guiService:GetGuiInset() ~= Vector2.new(0,0) then
+                guiService:ClearError()
+            end
+        end)
+    end)
 end)
 
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 200, 0, 100)
-main.Position = UDim2.new(0.5, -100, 0.4, 0)
-main.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+main.Size = UDim2.new(0, 220, 0, 110)
+main.Position = UDim2.new(0.5, -110, 0.4, 0)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 main.Active = true
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
 local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.fromRGB(255, 0, 100)
+stroke.Color = Color3.fromRGB(0, 200, 255)
 stroke.Thickness = 2
 
 local dragToggle, dragStart, startPos
@@ -73,20 +80,20 @@ end)
 
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, 0, 0, 35)
-title.Text = "TURSHU HUB"
-title.BackgroundColor3 = Color3.fromRGB(150, 0, 50)
+title.Text = "???"
+title.BackgroundColor3 = Color3.fromRGB(0, 50, 80)
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 Instance.new("UICorner", title).CornerRadius = UDim.new(0, 10)
 
 local status = Instance.new("TextLabel", main)
-status.Size = UDim2.new(1, 0, 0, 65)
-status.Position = UDim2.new(0, 0, 0.35, 0)
-status.Text = "ADMIN BYPASS: ACTIVE 🛡️\nNO DISCONNECT"
+status.Size = UDim2.new(1, 0, 0, 75)
+status.Position = UDim2.new(0, 0, 0.32, 0)
+status.Text = "PROTECTION: ACTIVE 🛡️\nSTATUS: UNDETECTABLE\nKICK BYPASS: ENABLED"
 status.TextColor3 = Color3.fromRGB(255, 255, 255)
 status.BackgroundTransparency = 1
 status.Font = Enum.Font.GothamBold
-status.TextSize = 12
+status.TextSize = 11
 
 local close = Instance.new("TextButton", main)
 close.Size = UDim2.new(0, 25, 0, 25)
