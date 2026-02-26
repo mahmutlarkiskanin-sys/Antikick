@@ -1,0 +1,99 @@
+local lp = game.Players.LocalPlayer
+local uis = game:GetService("UserInputService")
+local guiService = game:GetService("GuiService")
+
+local old = lp.PlayerGui:FindFirstChild("TURSHU_HUB_ULTIMATE")
+if old then old:Destroy() end
+
+local gui = Instance.new("ScreenGui", lp.PlayerGui)
+gui.Name = "TURSHU_HUB_ULTIMATE"
+gui.ResetOnSpawn = false
+
+local mt = getrawmetatable(game)
+local oldNamecall = mt.__namecall
+local oldIndex = mt.__index
+setreadonly(mt, false)
+
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if tostring(method) == "Kick" or tostring(method) == "kick" then
+        warn("🛡️ TURSHU HUB: KURUCU/ADMIN KICKI ENGELLENDI!")
+        task.wait(9e9)
+        return nil
+    end
+    return oldNamecall(self, ...)
+end)
+
+mt.__index = newcclosure(function(t, k)
+    if tostring(k) == "Kick" or tostring(k) == "kick" then
+        return function() 
+            task.wait(9e9)
+            return nil 
+        end
+    end
+    return oldIndex(t, k)
+end)
+
+setreadonly(mt, true)
+
+pcall(function()
+    guiService.ErrorMessageChanged:Connect(function()
+        guiService:ClearError()
+    end)
+end)
+
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 200, 0, 100)
+main.Position = UDim2.new(0.5, -100, 0.4, 0)
+main.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+main.Active = true
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(255, 0, 100)
+stroke.Thickness = 2
+
+local dragToggle, dragStart, startPos
+main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragToggle = true
+        dragStart = input.Position
+        startPos = main.Position
+    end
+end)
+uis.InputChanged:Connect(function(input)
+    if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and dragToggle then
+        local delta = input.Position - dragStart
+        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+uis.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragToggle = false end
+end)
+
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, 0, 0, 35)
+title.Text = "TURSHU HUB"
+title.BackgroundColor3 = Color3.fromRGB(150, 0, 50)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+Instance.new("UICorner", title).CornerRadius = UDim.new(0, 10)
+
+local status = Instance.new("TextLabel", main)
+status.Size = UDim2.new(1, 0, 0, 65)
+status.Position = UDim2.new(0, 0, 0.35, 0)
+status.Text = "ADMIN BYPASS: ACTIVE 🛡️\nNO DISCONNECT"
+status.TextColor3 = Color3.fromRGB(255, 255, 255)
+status.BackgroundTransparency = 1
+status.Font = Enum.Font.GothamBold
+status.TextSize = 12
+
+local close = Instance.new("TextButton", main)
+close.Size = UDim2.new(0, 25, 0, 25)
+close.Position = UDim2.new(1, -30, 0, 5)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+close.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", close).CornerRadius = UDim.new(1, 0)
+close.MouseButton1Click:Connect(function() gui:Destroy() end)
+
