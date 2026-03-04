@@ -62,54 +62,23 @@ MainGui.Name = "MyCustomGui"
 MainGui.ResetOnSpawn = false
 
 local Frame = Instance.new("Frame", MainGui)
-Frame.Size = UDim2.new(0, 140, 0, 50)
+Frame.Size = UDim2.new(0, 180, 0, 40)
 Frame.Position = UDim2.new(0.05, 0, 0.4, 0)
 Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 Frame.BorderSizePixel = 0
 Frame.Active = true
 Frame.Draggable = true
 
-local JerkBtn = Instance.new("TextButton", Frame)
-JerkBtn.Size = UDim2.new(0.9, 0, 0.8, 0)
-JerkBtn.Position = UDim2.new(0.05, 0, 0.1, 0)
-JerkBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-JerkBtn.Text = "JERK: OFF"
-JerkBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-JerkBtn.Font = Enum.Font.GothamBold
-JerkBtn.TextSize = 14
-
-local jerkActive = false 
-local jerkAngle = 0
-
-JerkBtn.MouseButton1Click:Connect(function()
-    jerkActive = not jerkActive
-    if jerkActive then
-        JerkBtn.Text = "JERK: ON"
-        JerkBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-    else
-        JerkBtn.Text = "JERK: OFF"
-        JerkBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-        pcall(function()
-            local char = lp.Character
-            local rS = char:FindFirstChild("Right Shoulder", true) or char:FindFirstChild("RightShoulder", true)
-            if rS then rS.C0 = CFrame.new(1, 0.5, 0) * CFrame.Angles(0, math.rad(90), 0) end
-        end)
-    end
-end)
-
-runService.Stepped:Connect(function()
-    if jerkActive and lp.Character then
-        local rS = lp.Character:FindFirstChild("Right Shoulder", true) or lp.Character:FindFirstChild("RightShoulder", true)
-        if rS and rS:IsA("Motor6D") then
-            jerkAngle = jerkAngle + 0.4 
-            local hit = math.sin(jerkAngle) * 0.7
-            rS.C0 = CFrame.new(1, 0.1, 0) * CFrame.Angles(0, 0, hit - 1.4)
-        end
-    end
-end)
+local StatusLabel = Instance.new("TextLabel", Frame)
+StatusLabel.Size = UDim2.new(1, 0, 1, 0)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "ANTI-KICK: ACTIVE"
+StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextSize = 14
 
 starterGui:SetCore("SendNotification", {
     Title = "SYSTEM READY",
-    Text = "All features loaded successfully.",
+    Text = "Anti-Kick Shield is fully operational.",
     Duration = 3
 })
