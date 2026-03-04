@@ -3,21 +3,31 @@ local runService = game:GetService("RunService")
 local workspace = game:GetService("Workspace")
 local starterGui = game:GetService("StarterGui")
 
--- [Giriş Yazısı]
-local screenGui = Instance.new("ScreenGui", lp.PlayerGui)
-local welcomeLabel = Instance.new("TextLabel", screenGui)
+local oldGui = lp.PlayerGui:FindFirstChild("MyCustomGui")
+if oldGui then oldGui:Destroy() end
+
+local introGui = Instance.new("ScreenGui", lp.PlayerGui)
+local blackFrame = Instance.new("Frame", introGui)
+blackFrame.Size = UDim2.new(1, 0, 1, 0)
+blackFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+blackFrame.BorderSizePixel = 0
+
+local welcomeLabel = Instance.new("TextLabel", introGui)
 welcomeLabel.Size = UDim2.new(1, 0, 1, 0)
 welcomeLabel.BackgroundTransparency = 1
 welcomeLabel.Text = "OPEN SCRIPT"
 welcomeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 welcomeLabel.Font = Enum.Font.GothamBold
 welcomeLabel.TextSize = 60
-task.delay(3, function() if screenGui then screenGui:Destroy() end end)
+welcomeLabel.ZIndex = 2
 
--- [Global Anti-Kick Bypass & English Alert]
+task.delay(3, function() 
+    if introGui then introGui:Destroy() end 
+end)
+
 local function ShowKickWarning()
     local notification = Instance.new("Hint", workspace)
-    notification.Text = "Security Alert: A kick attempt has been intercepted and bypassed. You are still in the session."
+    notification.Text = "Security Alert: A kick attempt has been intercepted and bypassed."
     task.wait(4)
     notification:Destroy()
 end
@@ -35,7 +45,9 @@ mt.__namecall = newcclosure(function(self, ...)
 end)
 setreadonly(mt, true)
 
--- [CFrame Sabit Blok (16x1x12 / Height: 18.5)]
+local oldPart = workspace:FindFirstChild("???_StablePart")
+if oldPart then oldPart:Destroy() end
+
 local refPart = Instance.new("Part", workspace)
 refPart.Size = Vector3.new(16, 1, 12)
 refPart.CFrame = CFrame.new(-410.2, 18.5, 63.1)
@@ -45,8 +57,10 @@ refPart.Color = Color3.fromRGB(255, 255, 255)
 refPart.Material = Enum.Material.SmoothPlastic
 refPart.Name = "???_StablePart"
 
--- [GUI TASARIMI]
 local MainGui = Instance.new("ScreenGui", lp.PlayerGui)
+MainGui.Name = "MyCustomGui"
+MainGui.ResetOnSpawn = false
+
 local Frame = Instance.new("Frame", MainGui)
 Frame.Size = UDim2.new(0, 140, 0, 50)
 Frame.Position = UDim2.new(0.05, 0, 0.4, 0)
@@ -64,7 +78,6 @@ JerkBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 JerkBtn.Font = Enum.Font.GothamBold
 JerkBtn.TextSize = 14
 
--- [Jerk Logic]
 local jerkActive = false 
 local jerkAngle = 0
 
@@ -97,6 +110,6 @@ end)
 
 starterGui:SetCore("SendNotification", {
     Title = "SYSTEM READY",
-    Text = "Global Protection & GUI Activated.",
+    Text = "All features loaded successfully.",
     Duration = 3
 })
