@@ -3,6 +3,7 @@ local runService = game:GetService("RunService")
 local workspace = game:GetService("Workspace")
 local starterGui = game:GetService("StarterGui")
 
+-- [Giriş Yazısı]
 local screenGui = Instance.new("ScreenGui", lp.PlayerGui)
 local welcomeLabel = Instance.new("TextLabel", screenGui)
 welcomeLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -11,66 +12,91 @@ welcomeLabel.Text = "OPEN SCRIPT"
 welcomeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 welcomeLabel.Font = Enum.Font.GothamBold
 welcomeLabel.TextSize = 60
-welcomeLabel.ZIndex = 10
+task.delay(3, function() if screenGui then screenGui:Destroy() end end)
 
-task.delay(3, function()
-    if welcomeLabel then welcomeLabel:Destroy() end
-    if screenGui then screenGui:Destroy() end
+-- [Global Anti-Kick Bypass & English Alert]
+local function ShowKickWarning()
+    local notification = Instance.new("Hint", workspace)
+    notification.Text = "Security Alert: A kick attempt has been intercepted and bypassed. You are still in the session."
+    task.wait(4)
+    notification:Destroy()
+end
+
+local mt = getrawmetatable(game)
+local oldNamecall = mt.__namecall
+setreadonly(mt, false)
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method == "Kick" or method == "kick" or method == "Disconnect" then 
+        task.spawn(ShowKickWarning)
+        return nil 
+    end
+    return oldNamecall(self, ...)
+end)
+setreadonly(mt, true)
+
+-- [CFrame Sabit Blok (16x1x12 / Height: 18.5)]
+local refPart = Instance.new("Part", workspace)
+refPart.Size = Vector3.new(16, 1, 12)
+refPart.CFrame = CFrame.new(-410.2, 18.5, 63.1)
+refPart.Anchored = true
+refPart.CanCollide = true
+refPart.Color = Color3.fromRGB(255, 255, 255)
+refPart.Material = Enum.Material.SmoothPlastic
+refPart.Name = "???_StablePart"
+
+-- [GUI TASARIMI]
+local MainGui = Instance.new("ScreenGui", lp.PlayerGui)
+local Frame = Instance.new("Frame", MainGui)
+Frame.Size = UDim2.new(0, 140, 0, 50)
+Frame.Position = UDim2.new(0.05, 0, 0.4, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+
+local JerkBtn = Instance.new("TextButton", Frame)
+JerkBtn.Size = UDim2.new(0.9, 0, 0.8, 0)
+JerkBtn.Position = UDim2.new(0.05, 0, 0.1, 0)
+JerkBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+JerkBtn.Text = "JERK: OFF"
+JerkBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+JerkBtn.Font = Enum.Font.GothamBold
+JerkBtn.TextSize = 14
+
+-- [Jerk Logic]
+local jerkActive = false 
+local jerkAngle = 0
+
+JerkBtn.MouseButton1Click:Connect(function()
+    jerkActive = not jerkActive
+    if jerkActive then
+        JerkBtn.Text = "JERK: ON"
+        JerkBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    else
+        JerkBtn.Text = "JERK: OFF"
+        JerkBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+        pcall(function()
+            local char = lp.Character
+            local rS = char:FindFirstChild("Right Shoulder", true) or char:FindFirstChild("RightShoulder", true)
+            if rS then rS.C0 = CFrame.new(1, 0.5, 0) * CFrame.Angles(0, math.rad(90), 0) end
+        end)
+    end
 end)
 
-local function AntiKick()
-    local mt = getrawmetatable(game)
-    local oldNamecall = mt.__namecall
-    setreadonly(mt, false)
-    mt.__namecall = newcclosure(function(self, ...)
-        local method = getnamecallmethod()
-        if method == "Kick" or method == "kick" or method == "Disconnect" then
-            return nil 
-        end
-        return oldNamecall(self, ...)
-    end)
-    setreadonly(mt, true)
-end
-pcall(AntiKick)
-
-local function CreateAnchor()
-    local targetCF = CFrame.new(-410.2, 19.2, 63.1)
-    local refPart = Instance.new("Part", workspace)
-    refPart.Name = "StablePart_???"
-    refPart.Size = Vector3.new(4, 0.5, 4)
-    refPart.CFrame = targetCF
-    refPart.Anchored = true
-    refPart.CanCollide = true
-    refPart.Color = Color3.fromRGB(255, 255, 255)
-    refPart.Material = Enum.Material.SmoothPlastic
-end
-CreateAnchor()
-
-local function ApplyXray()
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("BasePart") and not v:IsDescendantOf(lp.Character) then
-            v.Transparency = 0.5
-            v.CanCollide = true
-        end
-    end
-end
-ApplyXray()
-
-local jerkActive = true 
-local jerkAngle = 0
 runService.Stepped:Connect(function()
     if jerkActive and lp.Character then
         local rS = lp.Character:FindFirstChild("Right Shoulder", true) or lp.Character:FindFirstChild("RightShoulder", true)
         if rS and rS:IsA("Motor6D") then
-            jerkAngle = jerkAngle + 0.35 
-            local hit = math.sin(jerkAngle) * 0.6
+            jerkAngle = jerkAngle + 0.4 
+            local hit = math.sin(jerkAngle) * 0.7
             rS.C0 = CFrame.new(1, 0.1, 0) * CFrame.Angles(0, 0, hit - 1.4)
         end
     end
 end)
 
 starterGui:SetCore("SendNotification", {
-    Title = "???",
-    Text = "Shield, Jerk & X-Ray Active.",
-    Duration = 5
+    Title = "SYSTEM READY",
+    Text = "Global Protection & GUI Activated.",
+    Duration = 3
 })
