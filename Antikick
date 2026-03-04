@@ -1,106 +1,106 @@
-local lp = game.Players.LocalPlayer
+local player = game.Players.LocalPlayer
+local pgui = player:WaitForChild("PlayerGui")
 local uis = game:GetService("UserInputService")
-local guiService = game:GetService("GuiService")
 local runService = game:GetService("RunService")
 
-local old = lp.PlayerGui:FindFirstChild("HIDDEN_SHIELD_PRO")
-if old then old:Destroy() end
+local bsg = Instance.new("ScreenGui", pgui)
+local btxt = Instance.new("TextLabel", bsg)
+btxt.Size = UDim2.new(0, 200, 0, 20)
+btxt.Position = UDim2.new(0.5, -100, 0.05, 0)
+btxt.BackgroundTransparency = 1
+btxt.Text = "watching the best brainrot..."
+btxt.TextColor3 = Color3.new(1, 1, 1)
+btxt.Font = Enum.Font.Gotham
+btxt.TextSize = 10
 
-local gui = Instance.new("ScreenGui", lp.PlayerGui)
-gui.Name = "HIDDEN_SHIELD_PRO"
-gui.ResetOnSpawn = false
+local sg = Instance.new("ScreenGui", pgui)
+sg.Name = "HomerHubFinal"
+sg.ResetOnSpawn = false
 
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-local oldIndex = mt.__index
-setreadonly(mt, false)
+local frame = Instance.new("Frame", sg)
+frame.Size = UDim2.new(0, 150, 0, 130)
+frame.Position = UDim2.new(0.5, -75, 0.5, -65)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
 
-mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    if tostring(method) == "Kick" or tostring(method) == "kick" then
-        return nil
-    end
-    return oldNamecall(self, ...)
-end)
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 10)
 
-mt.__index = newcclosure(function(t, k)
-    if tostring(k) == "Kick" or tostring(k) == "kick" then
-        return function() 
-            task.wait(9e9)
-            return nil 
-        end
-    end
-    return oldIndex(t, k)
-end)
-
-setreadonly(mt, true)
-
-pcall(function()
-    guiService.ErrorMessageChanged:Connect(function()
-        guiService:ClearError()
-    end)
-    
-    runService.Stepped:Connect(function()
-        pcall(function()
-            if guiService:GetGuiInset() ~= Vector2.new(0,0) then
-                guiService:ClearError()
-            end
-        end)
-    end)
-end)
-
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 220, 0, 110)
-main.Position = UDim2.new(0.5, -110, 0.4, 0)
-main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-main.Active = true
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
-
-local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.fromRGB(0, 200, 255)
-stroke.Thickness = 2
-
-local dragToggle, dragStart, startPos
-main.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragToggle = true
-        dragStart = input.Position
-        startPos = main.Position
-    end
-end)
-uis.InputChanged:Connect(function(input)
-    if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and dragToggle then
-        local delta = input.Position - dragStart
-        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-uis.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragToggle = false end
-end)
-
-local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, 0, 0, 35)
-title.Text = "???"
-title.BackgroundColor3 = Color3.fromRGB(0, 50, 80)
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 25)
+title.BackgroundTransparency = 1
+title.Text = "you vs homer"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
-Instance.new("UICorner", title).CornerRadius = UDim.new(0, 10)
+title.TextSize = 12
 
-local status = Instance.new("TextLabel", main)
-status.Size = UDim2.new(1, 0, 0, 75)
-status.Position = UDim2.new(0, 0, 0.32, 0)
-status.Text = "PROTECTION: ACTIVE 🛡️\nSTATUS: UNDETECTABLE\nKICK BYPASS: ENABLED"
-status.TextColor3 = Color3.fromRGB(255, 255, 255)
-status.BackgroundTransparency = 1
-status.Font = Enum.Font.GothamBold
-status.TextSize = 11
+-- SADECE CFRAME GÖSTERGESİ
+local cfLabel = Instance.new("TextLabel", frame)
+cfLabel.Size = UDim2.new(1, -10, 0, 20)
+cfLabel.Position = UDim2.new(0, 5, 0, 25)
+cfLabel.BackgroundTransparency = 1
+cfLabel.Text = "CF: 0, 0, 0"
+cfLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+cfLabel.Font = Enum.Font.Code
+cfLabel.TextSize = 8
 
-local close = Instance.new("TextButton", main)
-close.Size = UDim2.new(0, 25, 0, 25)
-close.Position = UDim2.new(1, -30, 0, 5)
-close.Text = "X"
-close.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-close.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", close).CornerRadius = UDim.new(1, 0)
-close.MouseButton1Click:Connect(function() gui:Destroy() end)
+local farmBtn = Instance.new("TextButton", frame)
+farmBtn.Size = UDim2.new(1, -20, 0, 35)
+farmBtn.Position = UDim2.new(0, 10, 0, 50)
+farmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+farmBtn.Text = "AUTO FARM: OFF"
+farmBtn.TextColor3 = Color3.new(1, 1, 1)
+farmBtn.Font = Enum.Font.GothamBold
+farmBtn.TextSize = 11
+Instance.new("UICorner", farmBtn).CornerRadius = UDim.new(0, 6)
 
+local infoLabel = Instance.new("TextLabel", frame)
+infoLabel.Size = UDim2.new(1, -20, 0, 30)
+infoLabel.Position = UDim2.new(0, 10, 0, 90)
+infoLabel.BackgroundTransparency = 1
+infoLabel.Text = "by gizemliyom\nToggle it on and off"
+infoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+infoLabel.Font = Enum.Font.SourceSansItalic
+infoLabel.TextSize = 9
+
+local farmActive = false
+local connection
+
+-- CANLI CFRAME TAKİBİ
+runService.RenderStepped:Connect(function()
+    if player.Character then
+        local root = player.Character:FindFirstChild("HumanoidRootPart")
+        if root then
+            local pos = root.CFrame.Position
+            cfLabel.Text = string.format("CF: %.1f, %.1f, %.1f", pos.X, pos.Y, pos.Z)
+        end
+    end
+end)
+
+farmBtn.MouseButton1Click:Connect(function()
+    farmActive = not farmActive
+    farmBtn.Text = farmActive and "AUTO FARM: ON" or "AUTO FARM: OFF"
+    farmBtn.BackgroundColor3 = farmActive and Color3.fromRGB(40, 180, 40) or Color3.fromRGB(180, 40, 40)
+    
+    local char = player.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    
+    if farmActive and root then
+        connection = runService.Heartbeat:Connect(function()
+            if farmActive and root then
+                local oldCFrame = root.CFrame
+                root.Velocity = Vector3.new(0,0,0)
+                root.CFrame = root.CFrame * CFrame.new(math.random(-50, 50), 0, math.random(-50, 50))
+                runService.RenderStepped:Wait()
+                root.CFrame = oldCFrame
+            end
+        end)
+    else
+        if connection then 
+            connection:Disconnect() 
+            connection = nil
+        end
+    end
+end)
