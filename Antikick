@@ -1,106 +1,76 @@
-local player = game.Players.LocalPlayer
-local pgui = player:WaitForChild("PlayerGui")
-local uis = game:GetService("UserInputService")
+local lp = game:GetService("Players").LocalPlayer
 local runService = game:GetService("RunService")
+local workspace = game:GetService("Workspace")
+local starterGui = game:GetService("StarterGui")
 
-local bsg = Instance.new("ScreenGui", pgui)
-local btxt = Instance.new("TextLabel", bsg)
-btxt.Size = UDim2.new(0, 200, 0, 20)
-btxt.Position = UDim2.new(0.5, -100, 0.05, 0)
-btxt.BackgroundTransparency = 1
-btxt.Text = "watching the best brainrot..."
-btxt.TextColor3 = Color3.new(1, 1, 1)
-btxt.Font = Enum.Font.Gotham
-btxt.TextSize = 10
+local screenGui = Instance.new("ScreenGui", lp.PlayerGui)
+local welcomeLabel = Instance.new("TextLabel", screenGui)
+welcomeLabel.Size = UDim2.new(1, 0, 1, 0)
+welcomeLabel.BackgroundTransparency = 1
+welcomeLabel.Text = "OPEN SCRIPT"
+welcomeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+welcomeLabel.Font = Enum.Font.GothamBold
+welcomeLabel.TextSize = 60
+welcomeLabel.ZIndex = 10
 
-local sg = Instance.new("ScreenGui", pgui)
-sg.Name = "HomerHubFinal"
-sg.ResetOnSpawn = false
+task.delay(3, function()
+    if welcomeLabel then welcomeLabel:Destroy() end
+    if screenGui then screenGui:Destroy() end
+end)
 
-local frame = Instance.new("Frame", sg)
-frame.Size = UDim2.new(0, 150, 0, 130)
-frame.Position = UDim2.new(0.5, -75, 0.5, -65)
-frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
+local function AntiKick()
+    local mt = getrawmetatable(game)
+    local oldNamecall = mt.__namecall
+    setreadonly(mt, false)
+    mt.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        if method == "Kick" or method == "kick" or method == "Disconnect" then
+            return nil 
+        end
+        return oldNamecall(self, ...)
+    end)
+    setreadonly(mt, true)
+end
+pcall(AntiKick)
 
-local corner = Instance.new("UICorner", frame)
-corner.CornerRadius = UDim.new(0, 10)
+local function CreateAnchor()
+    local targetCF = CFrame.new(-410.2, 19.2, 63.1)
+    local refPart = Instance.new("Part", workspace)
+    refPart.Name = "StablePart_???"
+    refPart.Size = Vector3.new(4, 0.5, 4)
+    refPart.CFrame = targetCF
+    refPart.Anchored = true
+    refPart.CanCollide = true
+    refPart.Color = Color3.fromRGB(255, 255, 255)
+    refPart.Material = Enum.Material.SmoothPlastic
+end
+CreateAnchor()
 
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 25)
-title.BackgroundTransparency = 1
-title.Text = "you vs homer"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 12
+local function ApplyXray()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and not v:IsDescendantOf(lp.Character) then
+            v.Transparency = 0.5
+            v.CanCollide = true
+        end
+    end
+end
+ApplyXray()
 
--- SADECE CFRAME GÖSTERGESİ
-local cfLabel = Instance.new("TextLabel", frame)
-cfLabel.Size = UDim2.new(1, -10, 0, 20)
-cfLabel.Position = UDim2.new(0, 5, 0, 25)
-cfLabel.BackgroundTransparency = 1
-cfLabel.Text = "CF: 0, 0, 0"
-cfLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
-cfLabel.Font = Enum.Font.Code
-cfLabel.TextSize = 8
-
-local farmBtn = Instance.new("TextButton", frame)
-farmBtn.Size = UDim2.new(1, -20, 0, 35)
-farmBtn.Position = UDim2.new(0, 10, 0, 50)
-farmBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-farmBtn.Text = "AUTO FARM: OFF"
-farmBtn.TextColor3 = Color3.new(1, 1, 1)
-farmBtn.Font = Enum.Font.GothamBold
-farmBtn.TextSize = 11
-Instance.new("UICorner", farmBtn).CornerRadius = UDim.new(0, 6)
-
-local infoLabel = Instance.new("TextLabel", frame)
-infoLabel.Size = UDim2.new(1, -20, 0, 30)
-infoLabel.Position = UDim2.new(0, 10, 0, 90)
-infoLabel.BackgroundTransparency = 1
-infoLabel.Text = "by gizemliyom\nToggle it on and off"
-infoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-infoLabel.Font = Enum.Font.SourceSansItalic
-infoLabel.TextSize = 9
-
-local farmActive = false
-local connection
-
--- CANLI CFRAME TAKİBİ
-runService.RenderStepped:Connect(function()
-    if player.Character then
-        local root = player.Character:FindFirstChild("HumanoidRootPart")
-        if root then
-            local pos = root.CFrame.Position
-            cfLabel.Text = string.format("CF: %.1f, %.1f, %.1f", pos.X, pos.Y, pos.Z)
+local jerkActive = true 
+local jerkAngle = 0
+runService.Stepped:Connect(function()
+    if jerkActive and lp.Character then
+        local rS = lp.Character:FindFirstChild("Right Shoulder", true) or lp.Character:FindFirstChild("RightShoulder", true)
+        if rS and rS:IsA("Motor6D") then
+            jerkAngle = jerkAngle + 0.35 
+            local hit = math.sin(jerkAngle) * 0.6
+            rS.C0 = CFrame.new(1, 0.1, 0) * CFrame.Angles(0, 0, hit - 1.4)
         end
     end
 end)
 
-farmBtn.MouseButton1Click:Connect(function()
-    farmActive = not farmActive
-    farmBtn.Text = farmActive and "AUTO FARM: ON" or "AUTO FARM: OFF"
-    farmBtn.BackgroundColor3 = farmActive and Color3.fromRGB(40, 180, 40) or Color3.fromRGB(180, 40, 40)
-    
-    local char = player.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    
-    if farmActive and root then
-        connection = runService.Heartbeat:Connect(function()
-            if farmActive and root then
-                local oldCFrame = root.CFrame
-                root.Velocity = Vector3.new(0,0,0)
-                root.CFrame = root.CFrame * CFrame.new(math.random(-50, 50), 0, math.random(-50, 50))
-                runService.RenderStepped:Wait()
-                root.CFrame = oldCFrame
-            end
-        end)
-    else
-        if connection then 
-            connection:Disconnect() 
-            connection = nil
-        end
-    end
-end)
+starterGui:SetCore("SendNotification", {
+    Title = "???",
+    Text = "Shield, Jerk & X-Ray Active.",
+    Duration = 5
+})
